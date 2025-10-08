@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="プロフェッショナルな3D障害物回避ゲーム - Three.jsで作られた本格的なランナーゲーム">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>煮物作3Dゲーム</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="ui">
+            <div id="score-display">
+                <div class="score-label">スコア</div>
+                <div id="score">0</div>
+            </div>
+            <div id="high-score-display">
+                <div class="score-label">ハイスコア</div>
+                <div id="high-score">0</div>
+            </div>
+            <div id="speed-display">
+                <div class="score-label">スピード</div>
+                <div id="speed">1.0x</div>
+            </div>
+            <div id="difficulty-display">
+                <div class="score-label">難易度</div>
+                <div id="difficulty">ノーマル</div>
+            </div>
+            <div id="coin-display">
+                <div class="score-label">💰 コイン</div>
+                <div id="total-coins">0</div>
+            </div>
+        </div>
+        
+        <div id="secret-code-input">
+            <input type="text" id="secret-code" placeholder="コード入力" maxlength="20">
+            <button id="submit-code">✓</button>
+        </div>
+        
+        <div id="game-menu-buttons">
+            <button id="gacha-menu-btn" class="menu-btn">ガチャ</button>
+            <button id="skins-menu-btn" class="menu-btn">スキン</button>
+        </div>
+        
+        <div id="start-screen">
+            <h1>煮物作3Dゲーム</h1>
+            <div class="controls-info">
+                <p><strong>キーボード:</strong> ← → キーで左右に移動</p>
+                <p><strong>タッチ:</strong> 画面を左右にスワイプ</p>
+            </div>
+            
+            <div class="start-menu-section">
+                <div class="coin-info">
+                    <span class="coin-label">💰 所持コイン:</span>
+                    <span id="start-coins">0</span>
+                </div>
+                <div class="menu-row">
+                    <button id="start-gacha-btn" class="menu-action-btn">ガチャ</button>
+                    <button id="start-skins-btn" class="menu-action-btn">スキン選択</button>
+                </div>
+                <div class="secret-code-section">
+                    <input type="text" id="start-secret-code" placeholder="秘密コード入力" maxlength="20">
+                    <button id="start-submit-code" class="code-submit-btn">✓</button>
+                </div>
+            </div>
+            
+            <div class="game-mode-selector">
+                <h2>ゲームモードを選択</h2>
+                <div class="mode-buttons">
+                    <button class="mode-btn active" data-mode="avoid">
+                        <span class="mode-name">障害物を避ける</span>
+                        <span class="mode-desc">障害物を避けて進む</span>
+                    </button>
+                    <button class="mode-btn" data-mode="collect">
+                        <span class="mode-name">コインを集める</span>
+                        <span class="mode-desc">コインを集めてスコアアップ</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="difficulty-selector">
+                <h2>難易度を選択</h2>
+                <div class="difficulty-buttons">
+                    <button class="difficulty-btn" data-level="1">
+                        <span class="level-name">イージー</span>
+                        <span class="level-desc">初心者向け</span>
+                    </button>
+                    <button class="difficulty-btn active" data-level="2">
+                        <span class="level-name">ノーマル</span>
+                        <span class="level-desc">標準</span>
+                    </button>
+                    <button class="difficulty-btn" data-level="3">
+                        <span class="level-name">ハード</span>
+                        <span class="level-desc">上級者</span>
+                    </button>
+                    <button class="difficulty-btn" data-level="4">
+                        <span class="level-name">難しい</span>
+                        <span class="level-desc">かなり難しい</span>
+                    </button>
+                    <button class="difficulty-btn" data-level="5">
+                        <span class="level-name">一番むずい</span>
+                        <span class="level-desc">超上級者</span>
+                    </button>
+                </div>
+            </div>
+
+            <button id="start-button">ゲームスタート</button>
+        </div>
+        
+        <div id="game-over-screen" class="hidden">
+            <h1>GAME OVER</h1>
+            <div class="final-score">
+                <p>ファイナルスコア: <span id="final-score">0</span></p>
+                <p>獲得コイン: <span id="final-coins">0</span> 個 (+<span id="final-coins-currency">0</span> 💰)</p>
+                <p class="difficulty-completed">難易度: <span id="completed-difficulty">ノーマル</span></p>
+            </div>
+            
+            <div class="game-mode-selector">
+                <h2>ゲームモードを選択</h2>
+                <div class="mode-buttons">
+                    <button class="mode-btn active" data-mode="avoid">
+                        <span class="mode-name">障害物を避ける</span>
+                        <span class="mode-desc">障害物を避けて進む</span>
+                    </button>
+                    <button class="mode-btn" data-mode="collect">
+                        <span class="mode-name">コインを集める</span>
+                        <span class="mode-desc">コインを集めてスコアアップ</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="difficulty-selector">
+                <h2>次の難易度を選択</h2>
+                <div class="difficulty-buttons">
+                    <button class="difficulty-btn" data-level="1">
+                        <span class="level-name">簡単</span>
+                        <span class="level-desc">おもんない</span>
+                    </button>
+                    <button class="difficulty-btn" data-level="2">
+                        <span class="level-name">ちょい簡単</span>
+                        <span class="level-desc">簡単</span>
+                    </button>
+                    <button class="difficulty-btn" data-level="3">
+                        <span class="level-name">普通</span>
+                        <span class="level-desc">普通（？）</span>
+                    </button>
+                    <button class="difficulty-btn" data-level="4">
+                        <span class="level-name">ちょいムズ</span>
+                        <span class="level-desc">右と対して変わらん</span>
+                    </button>
+                    <button class="difficulty-btn" data-level="5">
+                        <span class="level-name">一番難しいやつ</span>
+                        <span class="level-desc">難しいよ</span>
+                    </button>
+                </div>
+            </div>
+
+            <button id="restart-button">もう一度プレイ</button>
+            <button id="back-to-start-from-gameover" class="secondary-btn">スタート画面に戻る</button>
+        </div>
+
+        <div class="volume-control">
+            <label for="volume-control">サウンド</label>
+            <input type="range" id="volume-control" min="0" max="1" step="0.1" value="0.5">
+        </div>
+        
+        <div id="gacha-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>ガチャ</h2>
+                <div class="gacha-info">
+                    <p>💰 所持コイン: <span id="gacha-coins">0</span></p>
+                    <p>コスト: 250 💰</p>
+                </div>
+                <button id="gacha-roll-btn" class="gacha-btn">ガチャを回す</button>
+                <div id="gacha-result" class="hidden">
+                    <h3 id="gacha-result-title"></h3>
+                    <div id="gacha-result-skin"></div>
+                </div>
+                <button id="close-gacha" class="close-btn">閉じる</button>
+            </div>
+        </div>
+        
+        <div id="skins-modal" class="modal hidden">
+            <div class="modal-content skins-content">
+                <h2>スキン選択</h2>
+                <div id="skins-grid"></div>
+                <button id="close-skins" class="close-btn">閉じる</button>
+            </div>
+        </div>
+        
+        <div id="history-tool-modal" class="modal hidden">
+            <div class="modal-content history-content">
+                <h2>履歴埋めツール</h2>
+                <div class="history-controls">
+                    <div class="control-group">
+                        <label>タイトル:</label>
+                        <input type="text" id="history-title" placeholder="ページ" value="ページ">
+                    </div>
+                    <div class="control-group">
+                        <label>変更速度 (ms):</label>
+                        <input type="number" id="history-speed" value="100" min="10" max="1000">
+                    </div>
+                    <div class="control-group">
+                        <label>回数:</label>
+                        <input type="number" id="history-count" value="100" min="1" max="10000">
+                    </div>
+                </div>
+                <button id="start-history" class="history-btn">開始</button>
+                <button id="stop-history" class="history-btn stop-btn">停止</button>
+                <div id="history-status"></div>
+                <button id="close-history" class="close-btn">閉じる</button>
+            </div>
+        </div>
+        
+        <div id="pause-screen" class="hidden">
+            <div class="pause-content">
+                <h1>一時停止</h1>
+                <p>Pキーまたはスペースキーで再開</p>
+                <button id="resume-button">再開</button>
+                <button id="settings-button">設定</button>
+                <button id="back-to-start-from-pause" class="secondary-btn">スタート画面に戻る</button>
+            </div>
+        </div>
+        
+        <div id="settings-modal" class="modal hidden">
+            <div class="modal-content settings-content">
+                <h2>キー設定</h2>
+                <div class="settings-controls">
+                    <div class="control-group">
+                        <label>左に移動:</label>
+                        <input type="text" id="key-left" readonly>
+                        <button class="key-bind-btn" data-action="left">変更</button>
+                    </div>
+                    <div class="control-group">
+                        <label>右に移動:</label>
+                        <input type="text" id="key-right" readonly>
+                        <button class="key-bind-btn" data-action="right">変更</button>
+                    </div>
+                    <div class="control-group">
+                        <label>一時停止:</label>
+                        <input type="text" id="key-pause" readonly>
+                        <button class="key-bind-btn" data-action="pause">変更</button>
+                    </div>
+                </div>
+                <button id="reset-keys" class="settings-btn">デフォルトに戻す</button>
+                <button id="close-settings" class="close-btn">閉じる</button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="/script.js"></script>
+</body>
+</html>
